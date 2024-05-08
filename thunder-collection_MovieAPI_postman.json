@@ -1,0 +1,82 @@
+{
+    "info": {
+        "_postman_id": "cb23f00a-4250-4ba1-833c-a8649e044c29",
+        "name": "MovieAPI",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": ""
+    },
+    "item": [
+        {
+            "name": "get all movies",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:5237/movie?skip=2&take=5",
+                    "query": [
+                        {
+                            "key": "skip",
+                            "value": "2"
+                        },
+                        {
+                            "key": "take",
+                            "value": "5"
+                        }
+                    ],
+                    "variable": [],
+                    "path": [
+                        "movie"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5237"
+                }
+            }
+        },
+        {
+            "name": "get movie by id",
+            "request": {
+                "method": "GET",
+                "url": {
+                    "raw": "http://localhost:5237/movie/2",
+                    "path": [
+                        "movie",
+                        "2"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5237"
+                }
+            }
+        },
+        {
+            "name": "create movie",
+            "request": {
+                "method": "POST",
+                "url": {
+                    "raw": "http://localhost:5237/movie",
+                    "path": [
+                        "movie"
+                    ],
+                    "protocol": "http",
+                    "host": [
+                        "localhost"
+                    ],
+                    "port": "5237"
+                },
+                "body": {
+                    "mode": "raw",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    },
+                    "raw": "{\r\n  \"Title\": \"oi\",\r\n  \"Genre\": \"Animation\",\r\n  \"Duration\": 90\r\n}"
+                }
+            }
+        }
+    ]
+}
