@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using MoviesAPI.Data;
 using MoviesAPI.Dtos;
@@ -32,25 +33,60 @@ public class MovieController : ControllerBase
   }
 
   [HttpGet]
-  public IEnumerable<Movie> GetMovies([FromQuery] int skip = 0, [FromQuery] int take = 50)
+  public IEnumerable<ReadMovieDto> GetMovies([FromQuery] int skip = 0, [FromQuery] int take = 50)
   {
-    return _movieContext.Movies.Skip(skip).Take(take);
+    return _mapper.Map<List<ReadMovieDto>>(
+      _movieContext.Movies.Skip(skip).Take(take)
+    );
   }
 
   [HttpGet("{id}")]
   public IActionResult GetMovieById(int id)
   {
-    var movie = _movieContext.Movies.FirstOrDefault(movie => movie.Id == id);
+    Movie? movie = _movieContext.Movies.FirstOrDefault(movie => movie.Id == id);
     if (movie == null) return NotFound();
-    return Ok(movie);
+
+    ReadMovieDto readMovieDto = _mapper.Map<ReadMovieDto>(movie);
+    return Ok(readMovieDto);
   }
 
   [HttpPut("{id}")]
   public IActionResult UpdateMovie(int id, [FromBody] UpdateMovieDto updateMovieDto)
   {
-    var movie = _movieContext.Movies.FirstOrDefault(movie => movie.Id == id);
+    Movie? movie = _movieContext.Movies.FirstOrDefault(movie => movie.Id == id);
     if (movie == null) return NotFound();
     _mapper.Map(updateMovieDto, movie);
+    _movieContext.SaveChanges();
+    return NoContent();
+  }
+
+  [HttpPatch("{id}")]
+  public IActionResult UpdateMoviePartial(int id, JsonPatchDocument<UpdateMovieDto> patchDocument)
+  {
+    Movie? movie = _movieContext.Movies.FirstOrDefault(movie => movie.Id == id);
+    if (movie == null) return NotFound();
+
+    UpdateMovieDto updateMovieDto = _mapper.Map<UpdateMovieDto>(movie);
+
+    patchDocument.ApplyTo(updateMovieDto, ModelState);
+
+    if(!TryValidateModel(updateMovieDto))
+    {
+      return ValidationProblem(ModelState);
+    }
+
+    _mapper.Map(updateMovieDto, movie);
+    _movieContext.SaveChanges();
+    return NoContent();
+  }
+
+  [HttpDelete("{id}")]
+  public IActionResult DeleteMovie(int id)
+  {
+    Movie? movie = _movieContext.Movies.FirstOrDefault(movie => movie.Id == id);
+    if (movie == null) return NotFound();
+
+    _movieContext.Remove(movie);
     _movieContext.SaveChanges();
     return NoContent();
   }
